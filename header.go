@@ -2,7 +2,6 @@ package gosimplemime
 
 import (
 	"fmt"
-	"log"
 	"mime/multipart"
 	"net/textproto"
 )
@@ -59,8 +58,6 @@ func (h *Header) write(mpw *multipart.Writer) error {
 	if s = h.Cc.String(); s != "" {
 		h.custom.Set("Cc", h.encoder.Encode(h.charset, s))
 	}
-
-	log.Println(h.custom.Get("Cc"))
 
 	if s = h.Bcc.String(); s != "" {
 		h.custom.Set("Bcc", h.encoder.Encode(h.charset, s))

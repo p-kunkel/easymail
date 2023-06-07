@@ -14,7 +14,7 @@ type Attachment struct {
 	File        bytes.Buffer
 }
 
-func (a *Attachment) write(mpw *multipart.Writer) error {
+func (a *Attachment) writeTo(mpw *multipart.Writer) error {
 	cp, err := mpw.CreatePart(a.getHeaders())
 	if err != nil {
 		return err

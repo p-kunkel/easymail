@@ -25,7 +25,7 @@ type RawMIME []byte
 
 type partCreator interface {
 	getHeaders() textproto.MIMEHeader
-	write(*multipart.Writer) error
+	CreateAndWritePartTo(*multipart.Writer) error
 }
 
 func NewMime() *MIME {
@@ -33,6 +33,7 @@ func NewMime() *MIME {
 		Headers: &Header{
 			encoder: mime.BEncoding,
 			charset: "UTF-8",
+			custom:  textproto.MIMEHeader{},
 		},
 	}
 }
@@ -56,7 +57,7 @@ func (m MIME) Raw() (RawMIME, error) {
 
 	if m.Parts != nil {
 		for _, v := range m.Parts {
-			if err = v.write(writer); err != nil {
+			if err = v.CreateAndWritePartTo(writer); err != nil {
 				return nil, err
 			}
 		}
@@ -120,10 +121,10 @@ func (m *MIME) SetCustomHeader(key, value string) {
 func (m *MIME) valid() error {
 	switch {
 	case m.Headers.From.valid() != nil:
-		return Error("TODO: write error")
+		return Error("invalid header 'from' address")
 
 	case len(m.Headers.To) == 0:
-		return Error("TODO: write error")
+		return Error("invalid header 'to' address")
 	}
 
 	return nil

@@ -15,17 +15,17 @@ func NewMessage(s string) *Message {
 	return &result
 }
 
-func (m *Message) write(mpw *multipart.Writer) error {
+func (m *Message) CreateAndWritePartTo(mpw *multipart.Writer) error {
 	if m == nil {
 		m = NewMessage("")
 	}
 
-	cp, err := mpw.CreatePart(m.getHeaders())
+	partWriter, err := mpw.CreatePart(m.getHeaders())
 	if err != nil {
 		return err
 	}
 
-	return writeQuotedPrintable(cp, *m)
+	return writeQuotedPrintable(partWriter, *m)
 }
 
 func (m *Message) getHeaders() textproto.MIMEHeader {
