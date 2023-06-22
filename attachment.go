@@ -14,8 +14,8 @@ type Attachment struct {
 	File        bytes.Buffer
 }
 
-func (a *Attachment) writeTo(mpw *multipart.Writer) error {
-	cp, err := mpw.CreatePart(a.getHeaders())
+func (a *Attachment) CreateAndWritePartTo(mpw *multipart.Writer) error {
+	cp, err := mpw.CreatePart(a.GetHeaders())
 	if err != nil {
 		return err
 	}
@@ -26,16 +26,14 @@ func (a *Attachment) writeTo(mpw *multipart.Writer) error {
 	return err
 }
 
-func (a *Attachment) getHeaders() textproto.MIMEHeader {
+func (a *Attachment) GetHeaders() textproto.MIMEHeader {
 	if a.ContentType == "" {
 		a.ContentType = http.DetectContentType(a.File.Bytes())
 	}
 
 	h := make(textproto.MIMEHeader)
 	h.Set("Content-Disposition", "attachment; filename=\""+a.Filename+"\"")
-	h.Set("Content-Description", a.Filename)
 	h.Set("Content-Type", a.ContentType+"; name=\""+a.Filename+"\"")
-	h.Add("d", "d")
 	h.Set("Content-Transfer-Encoding", "base64")
 	return h
 }

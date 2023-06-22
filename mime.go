@@ -18,13 +18,13 @@ func (e Error) Error() string {
 
 type MIME struct {
 	Headers *Header
-	Parts   []partCreator
+	Parts   []PartCreator
 }
 
 type RawMIME []byte
 
-type partCreator interface {
-	getHeaders() textproto.MIMEHeader
+type PartCreator interface {
+	GetHeaders() textproto.MIMEHeader
 	CreateAndWritePartTo(*multipart.Writer) error
 }
 
@@ -110,7 +110,7 @@ func (m *MIME) Bcc(s string, list ...string) error {
 	return m.Headers.Bcc.ParseList(strings.Join(append(list, s), ","))
 }
 
-func (m *MIME) AppendPart(pc partCreator) {
+func (m *MIME) AppendPart(pc PartCreator) {
 	m.Parts = append(m.Parts, pc)
 }
 

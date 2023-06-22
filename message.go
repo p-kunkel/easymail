@@ -1,9 +1,7 @@
 package gosimplemime
 
 import (
-	"io"
 	"mime/multipart"
-	"mime/quotedprintable"
 	"net/http"
 	"net/textproto"
 )
@@ -20,7 +18,7 @@ func (m *Message) CreateAndWritePartTo(mpw *multipart.Writer) error {
 		m = NewMessage("")
 	}
 
-	partWriter, err := mpw.CreatePart(m.getHeaders())
+	partWriter, err := mpw.CreatePart(m.GetHeaders())
 	if err != nil {
 		return err
 	}
@@ -28,16 +26,9 @@ func (m *Message) CreateAndWritePartTo(mpw *multipart.Writer) error {
 	return writeQuotedPrintable(partWriter, *m)
 }
 
-func (m *Message) getHeaders() textproto.MIMEHeader {
+func (m *Message) GetHeaders() textproto.MIMEHeader {
 	h := make(textproto.MIMEHeader)
 	h.Set("Content-Transfer-Encoding", "quoted-printable")
 	h.Set("Content-Type", http.DetectContentType(*m))
 	return h
-}
-
-func writeQuotedPrintable(w io.Writer, data []byte) error {
-	quotedPrintableEncoder := quotedprintable.NewWriter(w)
-	defer quotedPrintableEncoder.Close()
-	_, err := quotedPrintableEncoder.Write(data)
-	return err
 }

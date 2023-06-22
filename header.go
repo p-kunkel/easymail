@@ -17,10 +17,10 @@ type Header struct {
 
 	custom  textproto.MIMEHeader
 	charset string
-	encoder headerEncoder
+	encoder HeaderEncoder
 }
 
-type headerEncoder interface {
+type HeaderEncoder interface {
 	Encode(charset string, s string) string
 }
 
@@ -32,7 +32,7 @@ func (h *Header) Set(key, value string) {
 	h.custom.Set(key, h.encoder.Encode(h.charset, value))
 }
 
-func (h *Header) SetEncoder(he headerEncoder, charset string) {
+func (h *Header) SetEncoder(he HeaderEncoder, charset string) {
 	h.charset = charset
 	h.encoder = he
 }
