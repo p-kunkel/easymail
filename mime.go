@@ -38,6 +38,7 @@ func NewMime() *MIME {
 	}
 }
 
+//Returns a MIME message ready to be sent
 func (m MIME) Raw() (RawMIME, error) {
 	var (
 		err    error
@@ -77,6 +78,7 @@ func (m MIME) Raw() (RawMIME, error) {
 	return result, nil
 }
 
+//Sends message by SendMail function from net/smtp package
 func (m *MIME) SmtpSend(addr string, auth smtp.Auth) error {
 	b, err := m.Raw()
 	if err != nil {

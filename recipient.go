@@ -9,6 +9,7 @@ import (
 
 type Addresses []*Address
 
+//Returns addresses without name, e.g. ["john@example.com", "alice@example.com", "example@example.com"]
 func (a *Addresses) GetListOfAddresses() []string {
 	result := []string{}
 	for _, v := range *a {
@@ -17,14 +18,16 @@ func (a *Addresses) GetListOfAddresses() []string {
 	return result
 }
 
+//Returns ["John <john@example.com>", "Alice <alice@example.com>", "example@example.com"]
 func (a *Addresses) GetListOfAddressesWithName() []string {
-	if a != nil && len(*a) > 0 {
-		return strings.Split(a.String(), ",")
+	result := []string{}
+	for _, v := range *a {
+		result = append(result, v.String())
 	}
-	return nil
+	return result
 }
 
-//Parses the given string as a list of addresses, e.g. "John <john@example.com>, Alice <alice@example.com>"
+//Parses the given string as a list of addresses, e.g. "John <john@example.com>, Alice <alice@example.com>, example@example.com"
 func (r *Addresses) ParseList(s string) error {
 	if r == nil {
 		r = &Addresses{}
@@ -42,6 +45,7 @@ func (r *Addresses) Append(s string) error {
 	return err
 }
 
+//ParseAddressList parses the given string as a list of addresses.
 func ParseAddressList(s string) ([]*Address, error) {
 	address, err := mail.ParseAddressList(s)
 
@@ -63,14 +67,7 @@ func convertAddresses(a []*mail.Address) []*Address {
 }
 
 func (a Addresses) String() string {
-	result := ""
-	for i, v := range a {
-		result += v.String()
-		if i != len(a)-1 {
-			result += ","
-		}
-	}
-	return result
+	return strings.Join(a.GetListOfAddressesWithName(), ", ")
 }
 
 type Address mail.Address
@@ -82,13 +79,14 @@ func (a *Address) valid() error {
 	return nil
 }
 
+//ParseAddress parses a single RFC 5322 address, e.g. "John <john@example.com>" or "example@example.com"
 func (a *Address) Parse(s string) error {
-	aa, err := mail.ParseAddress(s)
+	pa, err := mail.ParseAddress(s)
 	if err != nil {
 		return err
 	}
 
-	*a = Address(*aa)
+	*a = Address(*pa)
 	return nil
 }
 
