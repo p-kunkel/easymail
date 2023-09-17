@@ -1,4 +1,4 @@
-module github.com/p-kunkel/go-simple-mime
+module github.com/p-kunkel/easymail
 
 go 1.17
 

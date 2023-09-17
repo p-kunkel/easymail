@@ -1,4 +1,4 @@
-package gosimplemime
+package easymail
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 type Error string
 
 func (e Error) Error() string {
-	return fmt.Sprintf("gosimplemime error: %s", string(e))
+	return fmt.Sprintf("easymail error: %s", string(e))
 }
 
 type MIME struct {
