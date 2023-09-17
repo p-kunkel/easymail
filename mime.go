@@ -2,7 +2,6 @@ package easymail
 
 import (
 	"bytes"
-	"fmt"
 	"mime"
 	"mime/multipart"
 	"net/smtp"
@@ -10,26 +9,20 @@ import (
 	"strings"
 )
 
-type Error string
-
-func (e Error) Error() string {
-	return fmt.Sprintf("easymail error: %s", string(e))
-}
-
-type MIME struct {
+type Mail struct {
 	Headers *Header
 	Parts   []PartCreator
 }
 
-type RawMIME []byte
+type MIME []byte
 
 type PartCreator interface {
 	GetHeaders() textproto.MIMEHeader
 	CreateAndWritePartTo(*multipart.Writer) error
 }
 
-func NewMime() *MIME {
-	return &MIME{
+func New() *Mail {
+	return &Mail{
 		Headers: &Header{
 			encoder: mime.BEncoding,
 			charset: "UTF-8",
@@ -39,10 +32,10 @@ func NewMime() *MIME {
 }
 
 //Returns a MIME message ready to be sent
-func (m MIME) Raw() (RawMIME, error) {
+func (m Mail) Raw() (MIME, error) {
 	var (
 		err    error
-		result RawMIME
+		result MIME
 	)
 
 	if err = m.valid(); err != nil {
@@ -79,7 +72,7 @@ func (m MIME) Raw() (RawMIME, error) {
 }
 
 //Sends message by SendMail function from net/smtp package
-func (m *MIME) SmtpSend(addr string, auth smtp.Auth) error {
+func (m *Mail) SmtpSend(addr string, auth smtp.Auth) error {
 	b, err := m.Raw()
 	if err != nil {
 		return err
@@ -88,39 +81,39 @@ func (m *MIME) SmtpSend(addr string, auth smtp.Auth) error {
 	return smtp.SendMail(addr, auth, m.Headers.From.String(), m.Headers.GetRecipients(), b)
 }
 
-func (m *MIME) Subject(s string) {
+func (m *Mail) Subject(s string) {
 	m.Headers.Subject = s
 }
 
-func (m *MIME) From(s string) error {
+func (m *Mail) From(s string) error {
 	return m.Headers.From.Parse(s)
 }
 
-func (m *MIME) ReplyTo(s string) error {
+func (m *Mail) ReplyTo(s string) error {
 	return m.Headers.ReplyTo.Parse(s)
 }
 
-func (m *MIME) To(s string, list ...string) error {
+func (m *Mail) To(s string, list ...string) error {
 	return m.Headers.To.ParseList(strings.Join(append(list, s), ","))
 }
 
-func (m *MIME) Cc(s string, list ...string) error {
+func (m *Mail) Cc(s string, list ...string) error {
 	return m.Headers.Cc.ParseList(strings.Join(append(list, s), ","))
 }
 
-func (m *MIME) Bcc(s string, list ...string) error {
+func (m *Mail) Bcc(s string, list ...string) error {
 	return m.Headers.Bcc.ParseList(strings.Join(append(list, s), ","))
 }
 
-func (m *MIME) AppendPart(pc PartCreator) {
+func (m *Mail) AppendPart(pc PartCreator) {
 	m.Parts = append(m.Parts, pc)
 }
 
-func (m *MIME) SetCustomHeader(key, value string) {
+func (m *Mail) SetCustomHeader(key, value string) {
 	m.Headers.Set(key, value)
 }
 
-func (m *MIME) valid() error {
+func (m *Mail) valid() error {
 	switch {
 	case m.Headers.From.valid() != nil:
 		return Error("invalid header 'from' address")
@@ -132,6 +125,6 @@ func (m *MIME) valid() error {
 	return nil
 }
 
-func (rm RawMIME) String() string {
+func (rm MIME) String() string {
 	return string(rm)
 }

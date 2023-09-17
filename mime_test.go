@@ -4,11 +4,12 @@ import (
 	"mime"
 	"testing"
 
+	"github.com/p-kunkel/easymail/message"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewMime(t *testing.T) {
-	m := NewMime()
+func TestNewMail(t *testing.T) {
+	m := New()
 	if !assert.Equal(t, mime.BEncoding, m.Headers.encoder) ||
 		!assert.Equal(t, "UTF-8", m.Headers.charset) {
 		t.FailNow()
@@ -16,7 +17,7 @@ func TestNewMime(t *testing.T) {
 }
 
 func TestMarshalingMimeToRaw(t *testing.T) {
-	m := NewMime()
+	m := New()
 	m.To("ABCśŹć <test2@example.com>")
 	m.From("test2@example.com")
 	actual, err := m.Raw()
@@ -38,7 +39,7 @@ func TestMarshalingMimeToRaw(t *testing.T) {
 
 func TestMimeSetSubject(t *testing.T) {
 	s := "test"
-	m := NewMime()
+	m := New()
 
 	m.Subject(s)
 	if !assert.Equal(t, s, m.Headers.Subject) {
@@ -51,7 +52,7 @@ func TestMimeSetFrom(t *testing.T) {
 		Address: "test@example.com",
 	}
 
-	m := NewMime()
+	m := New()
 	err := m.From(a.String())
 	if !assert.NoError(t, err) ||
 		!assert.Equal(t, a, m.Headers.From) {
@@ -65,7 +66,7 @@ func TestMimeSetReplyTo(t *testing.T) {
 		Address: "test@example.com",
 	}
 
-	m := NewMime()
+	m := New()
 	err := m.ReplyTo(a.String())
 	if !assert.NoError(t, err) ||
 		!assert.Equal(t, a, m.Headers.ReplyTo) {
@@ -84,7 +85,7 @@ func TestMimeSetTo(t *testing.T) {
 		Address: "test-2@example.com",
 	}
 
-	m := NewMime()
+	m := New()
 	err := m.To(a1.String(), a2.String())
 
 	if !assert.NoError(t, err) {
@@ -108,7 +109,7 @@ func TestMimeSetCc(t *testing.T) {
 		Address: "test-2@example.com",
 	}
 
-	m := NewMime()
+	m := New()
 	err := m.Cc(a1.String(), a2.String())
 
 	if !assert.NoError(t, err) {
@@ -132,7 +133,7 @@ func TestMimeSetBcc(t *testing.T) {
 		Address: "test-2@example.com",
 	}
 
-	m := NewMime()
+	m := New()
 	err := m.Bcc(a1.String(), a2.String())
 
 	if !assert.NoError(t, err) {
@@ -146,9 +147,9 @@ func TestMimeSetBcc(t *testing.T) {
 }
 
 func TestMimeAppendPart(t *testing.T) {
-	m := NewMime()
-	m.AppendPart(NewMessage("test message"))
-	m.AppendPart(NewMessage("test message 2"))
+	m := New()
+	m.AppendPart(message.New("test message"))
+	m.AppendPart(message.New("test message 2"))
 
 	if !assert.Equal(t, 2, len(m.Parts), "invalid parts length") {
 		t.FailNow()
@@ -158,7 +159,7 @@ func TestMimeAppendPart(t *testing.T) {
 func TestMimeSetCustomHeader(t *testing.T) {
 	k := "custom-header"
 	v := "test-custom-header-value"
-	m := NewMime()
+	m := New()
 
 	m.SetCustomHeader(k, v)
 	actualValue := m.Headers.custom.Get(k)
@@ -169,7 +170,7 @@ func TestMimeSetCustomHeader(t *testing.T) {
 }
 
 func TestMimeValidation(t *testing.T) {
-	m := NewMime()
+	m := New()
 
 	if !assert.Error(t, m.valid()) {
 		t.FailNow()

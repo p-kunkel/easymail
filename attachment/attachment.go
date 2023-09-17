@@ -1,4 +1,4 @@
-package easymail
+package attachment
 
 import (
 	"bytes"
@@ -16,7 +16,7 @@ type Attachment struct {
 	File        bytes.Buffer
 }
 
-func NewAttachment() *Attachment {
+func New() *Attachment {
 	return &Attachment{
 		File: bytes.Buffer{},
 	}

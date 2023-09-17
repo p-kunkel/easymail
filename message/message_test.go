@@ -1,4 +1,4 @@
-package easymail
+package message
 
 import (
 	"bytes"
@@ -11,7 +11,7 @@ import (
 func TestMessageWrite(t *testing.T) {
 	b := new(bytes.Buffer)
 	mw := multipart.NewWriter(b)
-	m := NewMessage("msg śćź")
+	m := New("msg śćź")
 
 	err := m.CreateAndWritePartTo(mw)
 	if !assert.NoError(t, err) {
@@ -24,7 +24,7 @@ func TestMessageWrite(t *testing.T) {
 }
 
 func TestMessageGetHeaders(t *testing.T) {
-	m := NewMessage("test")
+	m := New("test")
 	h := m.GetHeaders()
 
 	if !assert.Equal(t, "text/plain; charset=utf-8", h.Get("content-type")) ||
@@ -32,7 +32,7 @@ func TestMessageGetHeaders(t *testing.T) {
 		t.FailNow()
 	}
 
-	m = NewMessage("<!DOCTYPE html> test </html>")
+	m = New("<!DOCTYPE html> test </html>")
 	h = m.GetHeaders()
 
 	if !assert.Equal(t, "text/html; charset=utf-8", h.Get("content-type")) ||
